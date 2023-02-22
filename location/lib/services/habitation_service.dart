@@ -31,6 +31,10 @@ import 'package:location/models/type_habitat_data.dart';
       return _getHabitations(isHouse: false);
     }
 
+    List<Habitation> getAllHabitations() {
+      return _habitations;
+    }
+
     List<Habitation> _getHabitations({bool isHouse = true}) {
       return _habitations
           .where((element) => element.typeHabitat.id == (isHouse ? 1 : 2))

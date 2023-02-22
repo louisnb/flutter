@@ -1,12 +1,20 @@
+import 'dart:html';
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:location/models/habitation.dart';
 import 'package:intl/intl.dart';
+import 'package:location/models/location.dart';
 import 'package:location/models/type_habitat.dart';
 import 'package:location/services/habitation_service.dart';
 import 'package:location/share/location_style.dart';
 import 'package:location/share/location_text_style.dart';
 import 'package:location/views/habitation_list.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:location/views/location_list.dart';
+import 'package:location/views/login_page.dart';
+import 'package:location/views/profil.dart';
+import 'package:location/views/validation_location.dart'; 
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +33,12 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Mes locations'),
+      routes: {
+        Profil.routeName: (context) => const Profil(),
+        LoginPage.routeName: (context) => const LoginPage(),
+        LocationList.routeName: (context) => LocationList(),
+        ValidationLocation.routeName: (context) => const ValidationLocation(),
+      },
      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('en', 'US'), Locale('fr', 'FR')],
     );
@@ -55,10 +69,12 @@ class MyHomePage extends StatelessWidget {
             _buildTypeHabitat(context),
             SizedBox(height: 20),
             _buildDerniereLocation(context),
+            
           ],
         ),
       ),
-    );
+      bottomNavigationBar: BotttomNavigationBarWidget(0),
+      );   
   }
   _buildTypeHabitat(BuildContext context) {
     return Container(
@@ -167,8 +183,113 @@ class MyHomePage extends StatelessWidget {
         ],
       ),
     );
-  }
+  } 
 }
+
+class BotttomNavigationBarWidget extends StatelessWidget {
+    final int indexSelected;
+    const BotttomNavigationBarWidget(this.indexSelected, {Key? key}
+    ) : super(key: key);
+        
+
+    @override
+    Widget build(BuildContext context) {
+      bool isUserNotConnected = true;
+
+      return BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: indexSelected,
+        items: <BottomNavigationBarItem>[
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Accueil',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Recherche',
+          ),
+          BottomNavigationBarItem(
+            icon: isUserNotConnected
+                ? const Icon(Icons.shopping_cart_checkout_outlined)
+                : BadgeWidget(
+                  value: 0,
+                  top: 0,
+                  right: 0,
+                  child: const Icon(Icons.shopping_cart),
+                ),
+            label: 'locations',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profil',
+          ),
+        ],
+        onTap: (index) {
+          String page = '/';
+          switch (index) {
+            case 2:
+              page = LocationList.routeName;
+              break;
+            case 3:
+              page = Profil.routeName;
+              break;
+          }
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            page,
+            (route) => false,
+            );
+        },
+      );
+    }
+  }
+
+  class BadgeWidget extends StatelessWidget {
+    final double top;
+    final double right;
+    final Widget child;
+    final int value;
+    final Color? color;
+
+    BadgeWidget({
+      required this.child,
+      required this.value,
+      required this.top,
+      required this.right,
+      this.color,
+    });
+
+    @override
+    Widget build(BuildContext context) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          child,
+          value == 0
+              ? Container()
+              : Positioned(
+                right: this.right,
+                top: this.top,
+                child: Container(
+                  padding: EdgeInsets.all(2.0),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: this.color != null ? this.color : Colors.red
+                  ),
+                  child: Text(
+                    value.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
+                    ),
+                  ),
+                )
+              )
+        ],
+      );
+    }
+  }
 
 
 

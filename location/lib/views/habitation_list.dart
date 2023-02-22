@@ -16,6 +16,7 @@ HabitationList(this.isHouseList, {Key? key}) : super(key:key)
 {
   _habitations = isHouseList ? service.getMaisons() : service.getAppartements();
 }
+
 /*
   var _habitations =[
     Habitation(1,"maison.png","Maison1","Adresse1",2,50,500),
